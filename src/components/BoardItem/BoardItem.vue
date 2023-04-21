@@ -27,15 +27,13 @@
             restrictToInteger(e)
             {
                 if(e.target.innerText){
-                    e.target.innerText = e.target.innerText[0].replace(/[^\d.]/g, '');
+                    e.target.innerText = e.target.innerText[0].replace(/[^\d]/g, '');
                 }
-
                this.$store.dispatch('checkInputValue',{indexOfSlot:this.indexOfSlot, value:e.target.innerText})
-
             },
 
             isBorderBottom(){
-                if(this.indexItem>=19 && this.indexItem<=27    ){
+                if(this.indexItem>=19 && this.indexItem<=27){
                     return  '3px solid'
                 }
                 if(this.indexItem>=46 && this.indexItem<=54){
@@ -50,6 +48,7 @@
             // arrow functions can make the code very succinct!
             invalidSlots: state => state.invalidSlots,
         }),
+
 
 
     }

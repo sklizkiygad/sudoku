@@ -1,9 +1,7 @@
 <template>
     <div class="board">
-
    <BoardItem :indexOfSlot="index"  v-for="(item,index) in formattedArray" >
        {{item ? item:''}}
-      
    </BoardItem>
     </div>
 </template>
@@ -16,10 +14,7 @@
         data(){
             return{
                 formattedArray:[],
-
             }
-
-
         },
         // computed: mapState({
         //     // arrow functions can make the code very succinct!
@@ -55,7 +50,9 @@
         },
         mounted() {
             this.fillFormattedArray()
+
         },
+
         watch:{
             exampleArray:{
                 handler: function (val, oldVal) {

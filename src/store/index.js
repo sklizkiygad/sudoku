@@ -50,7 +50,10 @@ export default createStore({
 
       state.exampleArray.forEach((item)=>{
         item.forEach((subItem,subIndex)=>{
-          if(subIndex === slotData.indexInSubArray && subItem == +slotData.value ){
+          if(subIndex === slotData.indexInSubArray
+              && subItem == +slotData.value
+              && subIndex !== slotData.indexInSubArray
+              && index !== slotData.indexOfArray){
             isSameNumberInColumn=true
           }
         })
@@ -61,7 +64,7 @@ export default createStore({
     isSameNumberInRow({commit, state,dispatch},slotData){
       let isSameNumberInRow=false
       state.exampleArray[slotData.indexInArray].forEach((item,index)=>{
-        if(+slotData.value && item == +slotData.value ){
+        if(+slotData.value && item == +slotData.value && index !==slotData.indexInSubArray){
           isSameNumberInRow=true
         }
       })
@@ -72,35 +75,28 @@ export default createStore({
           rows = [],
           columns = [];
 
-
-
       await dispatch('getSquareIndexes',slotData.indexInArray).then(res=> {
         rows = res
       })
-      await   dispatch('getSquareIndexes',slotData.indexInSubArray).then(res=>{
+
+      await dispatch('getSquareIndexes',slotData.indexInSubArray).then(res=>{
           columns=res})
-
-
           rows.forEach(row => {
             columns.forEach(column => {
-              values.push(state.exampleArray[row][column]);
+              if(+slotData.indexInArray === row && +slotData.indexInSubArray === column){
+                values.push(0);
+              }else{
+                values.push(state.exampleArray[row][column]);
+              }
+
             });
           });
 
-
-
-
            return values.includes(+slotData.value)
-
-
-
-
     },
 
 
     getSquareIndexes(context,num) {
-      console.log(num)
-
       if (+num === 0 || +num === 1 || +num === 2) {
         return [0,1,2];
       } else if (+num === 3 || +num === 4 || +num === 5) {
@@ -109,48 +105,78 @@ export default createStore({
         return [6,7,8];
       }
     },
+    async checkCurrentValue({dispatch},dataForCheck){
+      let isSameNumberInColumn=false;
+      let isSameNumberInRow=false;
+      let isSameNumberInArea=false;
+      await dispatch('isSameNumberInColumn',dataForCheck).then(res=>{
+        isSameNumberInColumn=res
+      })
+      await dispatch('isSameNumberInRow',dataForCheck).then(res=>{
+        isSameNumberInRow=res
+      })
+      await dispatch('isSameNumberInArea',dataForCheck).then(res=>{
+        isSameNumberInArea=res
+
+      })
+
+
+      return !isSameNumberInRow && !isSameNumberInColumn && !isSameNumberInArea
+    },
 
     async checkInputValue({commit, state,dispatch},slotData){
-
       let indexOfArray=Math.ceil(+slotData.indexOfSlot /9)>=0?Math.floor(slotData.indexOfSlot/9):0,
           indexInSubArray= slotData.indexOfSlot-(9*indexOfArray)
-
       if(slotData.value){
         const dataForCheck={indexInArray:indexOfArray,
           indexInSubArray:indexInSubArray,
           value:slotData.value}
 
-        let isSameNumberInColumn=false;
-        let isSameNumberInRow=false;
-        let isSameNumberInArea=false;
-        await dispatch('isSameNumberInColumn',dataForCheck).then(res=>{
-          isSameNumberInColumn=res
-        })
-        await dispatch('isSameNumberInRow',dataForCheck).then(res=>{
-          isSameNumberInRow=res
-        })
-        await dispatch('isSameNumberInArea',dataForCheck).then(res=>{
-          isSameNumberInArea=res
-
-        })
+          let isValidSlot=false
+       await dispatch('checkCurrentValue',dataForCheck).then(res=>{
+         isValidSlot=res
+       })
 
 
+        if(isValidSlot){
 
-
-        if(!isSameNumberInRow && !isSameNumberInColumn && !isSameNumberInArea){
-          commit('insertInArray', {indexOfArray:indexOfArray,indexInSubArray:indexInSubArray,value:+slotData.value})
           commit('setInvalidSlots', {indexOfSlot:+slotData.indexOfSlot,event:"remove"})
         }
         else{
           commit('setInvalidSlots', {indexOfSlot:+slotData.indexOfSlot,event:"add"})
         }
+        commit('insertInArray', {indexOfArray:indexOfArray,indexInSubArray:indexInSubArray,value:+slotData.value})
       }
       else{
-
         commit('insertInArray', {indexOfArray:indexOfArray,indexInSubArray:indexInSubArray,value:0})
         commit('setInvalidSlots', {indexOfSlot:+slotData.indexOfSlot,event:"remove"})
       }
+      dispatch('checkExistsInvalid')
     },
+
+    checkExistsInvalid({commit, state,dispatch}){
+      state.invalidSlots.forEach(async item=>{
+
+        let indexOfArray=Math.ceil(+item /9)>=0?Math.floor(item/9):0,
+            indexInSubArray= item-(9*indexOfArray),
+        valueSlot=state.exampleArray[indexOfArray][indexInSubArray];
+        const dataForCheck={
+          indexInArray:indexOfArray,
+          indexInSubArray:indexInSubArray,
+          value:valueSlot
+        }
+
+        await dispatch('checkCurrentValue',dataForCheck).then((res)=>{
+          if(res){
+            console.log(item)
+            commit('setInvalidSlots', {indexOfSlot:+item,event:"remove"})
+          }
+
+        })
+      })
+    }
+
+
 
 
   },
