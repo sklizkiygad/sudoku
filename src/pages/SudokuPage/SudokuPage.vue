@@ -19,6 +19,6 @@
     }
 </script>
 
-<style scoped>
+<style  lang="scss">
 @import "SudokuPage.scss";
 </style>

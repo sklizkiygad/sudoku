@@ -73,7 +73,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss">
 
 @import "Board.scss";
 </style>

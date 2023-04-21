@@ -46,14 +46,15 @@ export default createStore({
         })
       })
 
+
       state.exampleArray[indexOfArray].forEach((item,index)=>{
 
         if(+slotData.value && item == +slotData.value ){
           isSameNumberInRow=true
         }
       })
-
-      if((isSameNumberInRow && isSameNumberInColumn) && !state.invalidSlots.includes(+slotData.indexOfSlot )){
+      console.log(isSameNumberInRow)
+      if((isSameNumberInRow || isSameNumberInColumn) && !state.invalidSlots.includes(+slotData.indexOfSlot )){
         state.invalidSlots=[...state.invalidSlots,slotData.indexOfSlot]
       }
       else if((!isSameNumberInRow && !isSameNumberInColumn)  ){

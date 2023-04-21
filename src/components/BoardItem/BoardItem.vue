@@ -56,7 +56,7 @@
 
 </script>
 
-<style scoped>
-@import "../../assets/variables.scss";
+<style lang="scss">
+
 @import "BoardItem.scss";
 </style>
