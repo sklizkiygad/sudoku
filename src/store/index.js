@@ -23,58 +23,18 @@ export default createStore({
   mutations: {
 
       setInvalidSlots(state,slotData){
-        if(slotData.event==='add')
-        if(!state.invalidSlots.includes(+slotData.indexOfSlot )){
+
+        if(slotData.event==='add' && !state.invalidSlots.includes(+slotData.indexOfSlot )){
           state.invalidSlots=[...state.invalidSlots,slotData.indexOfSlot]
         }
-        else if(slotData.event==='remove') {
-
+        else if(slotData.event==='remove' && state.invalidSlots.includes(+slotData.indexOfSlot)) {
+          state.invalidSlots=state.invalidSlots.filter(item=>item !=  +slotData.indexOfSlot)
         }
       },
 
 
     insertInArray(state,slotData){
       state.exampleArray[slotData.indexOfArray][slotData.indexInSubArray]=+slotData.value
-      // state.isValidNumber={indexOfSlot:0,isValid:true}
-      // let indexOfArray=Math.ceil(+slotData.indexOfSlot /9)>=0?Math.floor(slotData.indexOfSlot/9):0,
-      // indexInSubArray= slotData.indexOfSlot-(9*indexOfArray),
-      // isSameNumberInColumn = false,
-      // isSameNumberInRow = false
-      //
-      // state.exampleArray.forEach((item)=>{
-      //   item.forEach((subItem,subIndex)=>{
-      //     if(+slotData.value && subIndex === indexInSubArray && subItem == +slotData.value ){
-      //       isSameNumberInColumn=true
-      //     }
-      //   })
-      // })
-      // state.exampleArray[indexOfArray].forEach((item,index)=>{
-      //   if(+slotData.value && item == +slotData.value ){
-      //     isSameNumberInRow=true
-      //   }
-      // })
-      //
-      //
-      //
-      // if((isSameNumberInRow || isSameNumberInColumn) && !state.invalidSlots.includes(+slotData.indexOfSlot )){
-      //   state.invalidSlots=[...state.invalidSlots,slotData.indexOfSlot]
-      // }
-      // else if((!isSameNumberInRow && !isSameNumberInColumn)){
-      //   if(state.invalidSlots.includes(+slotData.indexOfSlot)){
-      //     state.invalidSlots=state.invalidSlots.filter(item=> item !== +slotData.indexOfSlot)
-      //   }
-      //   if(+slotData.value){
-      //     state.exampleArray[indexOfArray][indexInSubArray]=+slotData.value
-      //   }
-      //   else{
-      //     state.exampleArray[indexOfArray][indexInSubArray]=0
-      //   }
-      //
-      //
-      // }
-
-
-
     },
     setIsEndGame(state,isIt){
       state.isEndGame=isIt
@@ -107,19 +67,51 @@ export default createStore({
       })
       return isSameNumberInRow
     },
+    async isSameNumberInArea  ({commit, state,dispatch},slotData)  {
+      let values = [],
+          rows = [],
+          columns = [];
+
+
+
+      await dispatch('getSquareIndexes',slotData.indexInArray).then(res=> {
+        rows = res
+      })
+      await   dispatch('getSquareIndexes',slotData.indexInSubArray).then(res=>{
+          columns=res})
+
+
+          rows.forEach(row => {
+            columns.forEach(column => {
+              values.push(state.exampleArray[row][column]);
+            });
+          });
+
+
+
+
+           return values.includes(+slotData.value)
+
+
+
+
+    },
+
 
     getSquareIndexes(context,num) {
-      if (+num === 1) {
+      console.log(num)
+
+      if (+num === 0 || +num === 1 || +num === 2) {
         return [0,1,2];
-      } else if (+num === 2) {
+      } else if (+num === 3 || +num === 4 || +num === 5) {
         return [3,4,5];
       } else {
         return [6,7,8];
       }
     },
 
-    checkInputValue({commit, state,dispatch},slotData){
-      state.isValidNumber={indexOfSlot:0,isValid:true}
+    async checkInputValue({commit, state,dispatch},slotData){
+
       let indexOfArray=Math.ceil(+slotData.indexOfSlot /9)>=0?Math.floor(slotData.indexOfSlot/9):0,
           indexInSubArray= slotData.indexOfSlot-(9*indexOfArray)
 
@@ -130,52 +122,34 @@ export default createStore({
 
         let isSameNumberInColumn=false;
         let isSameNumberInRow=false;
-        dispatch('isSameNumberInColumn',dataForCheck).then(res=>{
+        let isSameNumberInArea=false;
+        await dispatch('isSameNumberInColumn',dataForCheck).then(res=>{
           isSameNumberInColumn=res
         })
-        dispatch('isSameNumberInRow',dataForCheck).then(res=>{
+        await dispatch('isSameNumberInRow',dataForCheck).then(res=>{
           isSameNumberInRow=res
+        })
+        await dispatch('isSameNumberInArea',dataForCheck).then(res=>{
+          isSameNumberInArea=res
+
         })
 
 
-        console.log(isSameNumberInRow)
-        console.log(isSameNumberInColumn)
-        console.log(!(isSameNumberInRow || isSameNumberInColumn))
-        if(!isSameNumberInRow && !isSameNumberInColumn){
+
+
+        if(!isSameNumberInRow && !isSameNumberInColumn && !isSameNumberInArea){
           commit('insertInArray', {indexOfArray:indexOfArray,indexInSubArray:indexInSubArray,value:+slotData.value})
+          commit('setInvalidSlots', {indexOfSlot:+slotData.indexOfSlot,event:"remove"})
         }
         else{
-          commit('setInvalidSlots', {indexOfArray:indexOfArray,indexInSubArray:indexInSubArray,value:+slotData.value})
+          commit('setInvalidSlots', {indexOfSlot:+slotData.indexOfSlot,event:"add"})
         }
       }
       else{
+
         commit('insertInArray', {indexOfArray:indexOfArray,indexInSubArray:indexInSubArray,value:0})
+        commit('setInvalidSlots', {indexOfSlot:+slotData.indexOfSlot,event:"remove"})
       }
-
-
-
-
-      // state.exampleArray[indexOfArray].forEach((item,index)=>{
-      //   if(+slotData.value && item == +slotData.value ){
-      //     isSameNumberInRow=true
-      //   }
-      // })
-      //
-      //
-      // if((isSameNumberInRow || isSameNumberInColumn) && !state.invalidSlots.includes(+slotData.indexOfSlot )){
-      //   state.invalidSlots=[...state.invalidSlots,slotData.indexOfSlot]
-      // }
-      // else if((!isSameNumberInRow && !isSameNumberInColumn)){
-      //   if(state.invalidSlots.includes(+slotData.indexOfSlot)){
-      //     state.invalidSlots=state.invalidSlots.filter(item=> item !== +slotData.indexOfSlot)
-      //   }
-      //   if(+slotData.value){
-      //     state.exampleArray[indexOfArray][indexInSubArray]=+slotData.value
-      //   }
-      //   else{
-      //     state.exampleArray[indexOfArray][indexInSubArray]=0
-      //   }
-      // }
     },
 
 

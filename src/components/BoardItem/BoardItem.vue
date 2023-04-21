@@ -30,7 +30,6 @@
                     e.target.innerText = e.target.innerText[0].replace(/[^\d.]/g, '');
                 }
 
-                // this.$store.commit('insertInArray',{indexOfSlot:this.indexOfSlot, value:e.target.innerText})
                this.$store.dispatch('checkInputValue',{indexOfSlot:this.indexOfSlot, value:e.target.innerText})
 
             },
