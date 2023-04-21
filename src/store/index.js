@@ -46,12 +46,18 @@ export default createStore({
   actions: {
     isSameNumberInColumn({commit, state,dispatch},slotData){
       let isSameNumberInColumn=false
+      console.log(slotData)
       state.exampleArray.forEach((item,index)=>{
+
         item.forEach((subItem,subIndex)=>{
-          if(subIndex === slotData.indexInSubArray
+
+          if(subIndex == slotData.indexInSubArray
               && subItem == +slotData.value
-              && index !==slotData.indexOfArray
+              && index !== slotData.indexInArray
+
              ){
+
+
             isSameNumberInColumn=true
           }
         })
