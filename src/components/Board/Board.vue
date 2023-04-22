@@ -3,6 +3,12 @@
    <BoardItem :indexOfSlot="index"  v-for="(item,index) in formattedArray" >
        {{item ? item:''}}
    </BoardItem>
+
+        <div class="board-button">
+
+
+        <button class="button-arounder" @click="startAgain">Заново</button>
+        </div>
     </div>
 </template>
 
@@ -24,6 +30,7 @@
         computed: mapState(['exampleArray']),
         methods:{
             fillFormattedArray(){
+
                 this.exampleArray.forEach((item)=>{
                     item.forEach(subItem=>{
                         this.formattedArray.push(subItem)
@@ -45,11 +52,39 @@
                     this.$store.commit('setIsEndGame',true)
                 }
 
+            },
+            startAgain(){
+                this.$store.commit('resetArray')
+                this.clearAllSlots()
+                this.formattedArray=[]
+                this.fillFormattedArray()
+            },
+            checkContentEditableSlots(){
+                setTimeout(()=>{
+                    const boardItemsList= [...document.getElementsByClassName('board-item')]
+                    boardItemsList.map(item=>{
+                        if(item.innerText){
+                            item.style.background="#afafaf"
+                            item.contentEditable=false
+                        }
+                    })
+
+                },0)
+            },
+            clearAllSlots(){
+                    const boardItemsList= [...document.getElementsByClassName('board-item')]
+                    boardItemsList.map(item=>{
+                        if(item.contentEditable==='true'){
+                            item.innerText=''
+                        }
+                    })
             }
+
 
         },
         mounted() {
             this.fillFormattedArray()
+            this.checkContentEditableSlots()
 
         },
 
@@ -60,7 +95,8 @@
                 },
                 deep: true
 
-            }
+            },
+
 
         }
 

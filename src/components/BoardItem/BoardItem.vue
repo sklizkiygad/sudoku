@@ -2,14 +2,15 @@
     <div class="board-item"
          :style="{borderBottom:isBorderBottom()}"
          :class="invalidSlots.includes(indexOfSlot)? 'invalid-slot':'' "
-         contenteditable
+         :contenteditable="isContentEditable()"
          @input="restrictToInteger">
         <slot></slot>
     </div>
 </template>
 
 <script>
-    import {mapMutations, mapState} from "vuex";
+    import { mapState} from "vuex";
+
 
     export default {
 
@@ -40,6 +41,10 @@
                     return  '3px solid'
                 }
 
+            },
+            isContentEditable(){
+                document.getElementsByClassName("board-item")
+                return true
             }
 
         },

@@ -2,7 +2,7 @@
     <div class="main-page">
         <div class="main-menu">
             <RouterLink to="/sudoku" class="button-arounder">Играть</RouterLink>
-            <RouterLink to="/check" class="button-arounder">Заполнять</RouterLink>
+<!--            <RouterLink to="/check" class="button-arounder">Заполнять</RouterLink>-->
 
         </div>
     </div>
